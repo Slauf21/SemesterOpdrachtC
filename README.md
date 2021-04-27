@@ -1,2 +1,2 @@
 # SemesterOpdrachtC
-Gangsta shit
+Gangsta shit 😎
