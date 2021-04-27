@@ -5,6 +5,7 @@
 #define __DEBUG
 
 #define BMPINPUTFILE "test.bmp"
+#define SECRETMSG "SecretMessage.txt"
 
 int main(int argc, char* argv[])
 {
@@ -21,7 +22,9 @@ int main(int argc, char* argv[])
 		}
 	}	
 	
-	//Lezen van de file:
+	//--------------------------------------------------------------------------------------------------------------------
+	
+	//Lezen van de image:
     #ifdef __DEBUG
         printf("DEBUG info: BMP transformer\n");
     #endif
@@ -65,7 +68,28 @@ int main(int argc, char* argv[])
     fclose(inputFilePointer);
     free(inputPixels);
 	
+	printf("\n");
 	
+	//--------------------------------------------------------------------------------------------------------------------
+	
+	//Lezen van de secret message:
+	FILE *fp = fopen(SECRETMSG, "r");
+	unsigned char c = 0;
+	
+	if (fp == NULL)
+	{
+		printf("Cant open file");
+		exit(EXIT_FAILURE);
+	}	
+	
+	do
+	{
+		c = fgetc(fp);
+		putchar(c);
+	}
+	while (c != EOF);
     
+	fclose(fp);
+	
     return 0;
 }
