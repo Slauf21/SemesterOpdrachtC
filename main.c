@@ -1,12 +1,27 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #define __DEBUG
 
 #define BMPINPUTFILE "test.bmp"
 
-int main()
+int main(int argc, char* argv[])
 {
+	//--help commando maken:
+	if (argc > 1)
+	{
+		for (int i = 0; i < argc; i++)
+		{
+			if (strcmp(argv[i], "--help") == 0)
+			{
+				printf("%s\n", "Dit is de uitleg van het programma");
+				return 0;
+			}
+		}
+	}	
+	
+	//Lezen van de file:
     #ifdef __DEBUG
         printf("DEBUG info: BMP transformer\n");
     #endif
@@ -49,6 +64,8 @@ int main()
    
     fclose(inputFilePointer);
     free(inputPixels);
+	
+	
     
     return 0;
 }
