@@ -84,8 +84,9 @@ int main(int argc, char* argv[])
 	
 	do
 	{
-		c = fgetc(fp);
-		putchar(c);
+		c = fgetc(fp);		
+		
+		printf("%d", c);
 	}
 	while (c != EOF);
     
