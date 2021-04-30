@@ -88,7 +88,7 @@ int main(int argc, char* argv[])
 		
 		printf("%d", c);
 	}
-	while (c != EOF);
+	while (!feof(fp));
     
 	fclose(fp);
 	
