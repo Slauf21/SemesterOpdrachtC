@@ -75,7 +75,7 @@ int main(int argc, char* argv[])
 	//Lezen van de secret message:
 	FILE *fp = fopen(SECRETMSG, "r");
 	unsigned char c = 0;
-	
+	unsigned char bit7 = 0,bit6,bit5,bit4,bit3,bit2,bit1,bit0;
 	if (fp == NULL)
 	{
 		printf("Cant open file");
@@ -85,12 +85,18 @@ int main(int argc, char* argv[])
 	do
 	{
 		c = fgetc(fp);		
-		
-		printf("%d", c);
+		bit7=(c & 0x80)>>7;
+		bit6=(c & 0x40)>>6;
+		bit5=(c & 0x20)>>5;
+		bit4=(c & 0x10)>>4;
+		bit3=(c & 0x08)>>3;
+		bit2=(c & 0x04)>>2;
+		bit1=(c & 0x02)>>1;
+		bit0=c & 0x01;
+		printf("%d%d%d%d%d%d%d%d ", bit7,bit6,bit5,bit4,bit3,bit2,bit1,bit0);
 	}
-	while (c != EOF);
+	while (!feof(fp));
     
 	fclose(fp);
-	
     return 0;
 }
