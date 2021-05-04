@@ -60,13 +60,12 @@ int main(int argc, char* argv[])
 	
     fread(inputPixels, sizeof(unsigned char), imageSize, inputFilePointer); // Lees alle pixels (de rest van de file
     fclose(inputFilePointer);
-	for(int i =0; i < imageSize-2; i+=3)
+	for(int i = 0; i < imageSize-2; i+=3)
 	{
 		printf("pixel %d: B= %d, G=%d, R=%d\n", i, inputPixels[i], inputPixels[i+1], inputPixels[i+2]);
 	}
    
     fclose(inputFilePointer);
-    free(inputPixels);
 	
 	printf("\n");
 	
@@ -93,10 +92,28 @@ int main(int argc, char* argv[])
 		bit2=(c & 0x04)>>2;
 		bit1=(c & 0x02)>>1;
 		bit0=c & 0x01;
-		printf("%d%d%d%d%d%d%d%d ", bit7,bit6,bit5,bit4,bit3,bit2,bit1,bit0);
+		printf("%d%d%d%d%d%d%d%d\n", bit7,bit6,bit5,bit4,bit3,bit2,bit1,bit0);
+		
+		for(int i = 7; i < imageSize-2; i+=7)
+		{
+			inputPixels[i] = inputPixels[i] ^ bit0;
+			inputPixels[i-1] = inputPixels[i-1] ^ bit1;
+			inputPixels[i-2] = inputPixels[i-2] ^ bit2;
+			inputPixels[i-3] = inputPixels[i-3] ^ bit3;
+			inputPixels[i-4] = inputPixels[i-4] ^ bit4;
+			inputPixels[i-5] = inputPixels[i-5] ^ bit5;
+			inputPixels[i-6] = inputPixels[i-6] ^ bit6;
+			inputPixels[i-7] = inputPixels[i-7] ^ bit7;
+		}
 	}
 	while (!feof(fp));
-    
+	
+	for(int i = 0; i < imageSize-2; i+=3)
+	{
+		printf("pixel %d: B= %d, G=%d, R=%d\n", i, inputPixels[i], inputPixels[i+1], inputPixels[i+2]);
+	}
+	
+	free(inputPixels);
 	fclose(fp);
     return 0;
 }
