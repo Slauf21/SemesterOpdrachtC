@@ -105,13 +105,76 @@ int main(int argc, char* argv[])
 			inputPixels[i-6] = inputPixels[i-6] ^ bit6;
 			inputPixels[i-7] = inputPixels[i-7] ^ bit7;*/
 			
-			if(inputPixels[i]%2==0)
+			if(inputPixels[i-7]%2==0)
 			{
-				inputPixels[i-7] = inputPixels[i-7] ^ bit7;
+				inputPixels[i-7] = inputPixels[i-7] | bit7;
 			}
 			else
 			{
-				inputPixels[i-7] = inputPixels[i-7] | bit7;
+				inputPixels[i-7] = inputPixels[i-7] ^ bit7;
+			}
+			
+			if(inputPixels[i-6]%2==0)
+			{
+				inputPixels[i-6] = inputPixels[i-6] | bit6;
+			}
+			else
+			{
+				inputPixels[i-6] = inputPixels[i-6] ^ bit6;
+			}
+			
+			if(inputPixels[i-5]%2==0)
+			{
+				inputPixels[i-5] = inputPixels[i-5] | bit5;
+			}
+			else
+			{
+				inputPixels[i-5] = inputPixels[i-5] ^ bit5;
+			}
+			
+			if(inputPixels[i-4]%2==0)
+			{
+				inputPixels[i-4] = inputPixels[i-4] | bit4;
+			}
+			else
+			{
+				inputPixels[i-4] = inputPixels[i-4] ^ bit4;
+			}
+			
+			if(inputPixels[i-3]%2==0)
+			{
+				inputPixels[i-3] = inputPixels[i-3] | bit3;
+			}
+			else
+			{
+				inputPixels[i-3] = inputPixels[i-3] ^ bit3;
+			}
+			
+			if(inputPixels[i-2]%2==0)
+			{
+				inputPixels[i-2] = inputPixels[i-2] | bit2;
+			}
+			else
+			{
+				inputPixels[i-2] = inputPixels[i-2] ^ bit2;
+			}
+			
+			if(inputPixels[i-1]%2==0)
+			{
+				inputPixels[i-1] = inputPixels[i-1] | bit1;
+			}
+			else
+			{
+				inputPixels[i-1] = inputPixels[i-1] ^ bit1;
+			}
+			
+			if(inputPixels[i]%2==0)
+			{
+				inputPixels[i] = inputPixels[i] | bit0;
+			}
+			else
+			{
+				inputPixels[i] = inputPixels[i] ^ bit0;
 			}
 			
 		}
