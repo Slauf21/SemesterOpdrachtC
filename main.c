@@ -74,7 +74,7 @@ int main(int argc, char* argv[])
 	//Lezen van de secret message:
 	FILE *fp = fopen(SECRETMSG, "r");
 	unsigned char c = 0;
-	unsigned char bit7 = 0,bit6,bit5,bit4,bit3,bit2,bit1,bit0;
+	unsigned char bit7 = 0,bit6= 0,bit5= 0,bit4= 0,bit3= 0,bit2= 0,bit1= 0,bit0= 0;
 	if (fp == NULL)
 	{
 		printf("Cant open file");
@@ -96,14 +96,24 @@ int main(int argc, char* argv[])
 		
 		for(int i = 7; i < imageSize-2; i+=7)
 		{
-			inputPixels[i] = inputPixels[i] ^ bit0;
+			/*inputPixels[i] = inputPixels[i] ^ bit0;
 			inputPixels[i-1] = inputPixels[i-1] ^ bit1;
 			inputPixels[i-2] = inputPixels[i-2] ^ bit2;
 			inputPixels[i-3] = inputPixels[i-3] ^ bit3;
 			inputPixels[i-4] = inputPixels[i-4] ^ bit4;
 			inputPixels[i-5] = inputPixels[i-5] ^ bit5;
 			inputPixels[i-6] = inputPixels[i-6] ^ bit6;
-			inputPixels[i-7] = inputPixels[i-7] ^ bit7;
+			inputPixels[i-7] = inputPixels[i-7] ^ bit7;*/
+			
+			if(inputPixels[i]%2==0)
+			{
+				inputPixels[i-7] = inputPixels[i-7] ^ bit7;
+			}
+			else
+			{
+				inputPixels[i-7] = inputPixels[i-7] | bit7;
+			}
+			
 		}
 	}
 	while (!feof(fp));
@@ -117,3 +127,4 @@ int main(int argc, char* argv[])
 	fclose(fp);
     return 0;
 }
+//gcc -Wall -pedantic main.c -o test
