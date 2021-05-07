@@ -80,7 +80,7 @@ int main(int argc, char* argv[])
 		printf("Cant open file");
 		exit(EXIT_FAILURE);
 	}	
-	
+	int i = 7;
 	do
 	{
 		c = fgetc(fp);		
@@ -94,90 +94,27 @@ int main(int argc, char* argv[])
 		bit0=c & 0x01;
 		printf("%d%d%d%d%d%d%d%d\n", bit7,bit6,bit5,bit4,bit3,bit2,bit1,bit0);
 		
-		for(int i = 7; i < imageSize-2; i+=7)
-		{
-			/*inputPixels[i] = inputPixels[i] ^ bit0;
-			inputPixels[i-1] = inputPixels[i-1] ^ bit1;
-			inputPixels[i-2] = inputPixels[i-2] ^ bit2;
-			inputPixels[i-3] = inputPixels[i-3] ^ bit3;
-			inputPixels[i-4] = inputPixels[i-4] ^ bit4;
-			inputPixels[i-5] = inputPixels[i-5] ^ bit5;
-			inputPixels[i-6] = inputPixels[i-6] ^ bit6;
-			inputPixels[i-7] = inputPixels[i-7] ^ bit7;*/
+		//De letter in de pixels zetten
+		if (i < imageSize-2)
+		{	
+			inputPixels[i-7] = (inputPixels[i-7] & 0xFE) | bit7;
 			
-			if(inputPixels[i-7]%2==0)
-			{
-				inputPixels[i-7] = inputPixels[i-7] | bit7;
-			}
-			else
-			{
-				inputPixels[i-7] = inputPixels[i-7] ^ bit7;
-			}
+			inputPixels[i-6] = (inputPixels[i-6] & 0xFE) | bit6;
 			
-			if(inputPixels[i-6]%2==0)
-			{
-				inputPixels[i-6] = inputPixels[i-6] | bit6;
-			}
-			else
-			{
-				inputPixels[i-6] = inputPixels[i-6] ^ bit6;
-			}
+			inputPixels[i-5] = (inputPixels[i-5] & 0xFE) | bit5;
 			
-			if(inputPixels[i-5]%2==0)
-			{
-				inputPixels[i-5] = inputPixels[i-5] | bit5;
-			}
-			else
-			{
-				inputPixels[i-5] = inputPixels[i-5] ^ bit5;
-			}
+			inputPixels[i-4] = (inputPixels[i-4] & 0xFE) | bit4;
 			
-			if(inputPixels[i-4]%2==0)
-			{
-				inputPixels[i-4] = inputPixels[i-4] | bit4;
-			}
-			else
-			{
-				inputPixels[i-4] = inputPixels[i-4] ^ bit4;
-			}
+			inputPixels[i-3] = (inputPixels[i-3] & 0xFE) | bit3;
 			
-			if(inputPixels[i-3]%2==0)
-			{
-				inputPixels[i-3] = inputPixels[i-3] | bit3;
-			}
-			else
-			{
-				inputPixels[i-3] = inputPixels[i-3] ^ bit3;
-			}
+			inputPixels[i-2] = (inputPixels[i-2] & 0xFE) | bit2;
 			
-			if(inputPixels[i-2]%2==0)
-			{
-				inputPixels[i-2] = inputPixels[i-2] | bit2;
-			}
-			else
-			{
-				inputPixels[i-2] = inputPixels[i-2] ^ bit2;
-			}
+			inputPixels[i-1] = (inputPixels[i-1] & 0xFE) | bit1;
 			
-			if(inputPixels[i-1]%2==0)
-			{
-				inputPixels[i-1] = inputPixels[i-1] | bit1;
-			}
-			else
-			{
-				inputPixels[i-1] = inputPixels[i-1] ^ bit1;
-			}
-			
-			if(inputPixels[i]%2==0)
-			{
-				inputPixels[i] = inputPixels[i] | bit0;
-			}
-			else
-			{
-				inputPixels[i] = inputPixels[i] ^ bit0;
-			}
-			
+			inputPixels[i] = (inputPixels[i] & 0xFE) | bit0;			
 		}
+		
+		i += 8;
 	}
 	while (!feof(fp));
 	
