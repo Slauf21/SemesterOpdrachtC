@@ -10,6 +10,36 @@ void compress(unsigned char *pArrayBits, unsigned char *inputPixels, int i, int 
 
 int main(int argc, char* argv[])
 {
+	FILE *fp = NULL;
+	
+	//Commandos maken:
+	if (argc > 1)
+	{	
+		if (strcmp(argv[1], "--help") == 0)
+		{
+			printf("%s\n", "Input formaten:");
+			printf("%s\n", "Compress: test -c -s inputtxtfile -i inputbmpfile -o outputbmpfile");
+			printf("%s\n", "Decompress: test -d -i inputbmp -o outputtxtfile");
+			return 0;
+		}
+		
+		if (strcmp(argv[1], "-c") == 0 && strcmp(argv[2], "-s") == 0)
+		{
+			fp = fopen(argv[3], "r");
+			
+			if (fp == NULL)
+			{
+				printf("Cant open file");
+				exit(EXIT_FAILURE);
+			}	
+		}		
+	}
+
+	else 
+	{
+		printf("%s\n", "Verkeerde input, type --help voor de uitleg.");
+		exit(EXIT_FAILURE);
+	}
 	
 	//--------------------------------------------------------------------------------------------------------------------
 	
@@ -64,28 +94,6 @@ int main(int argc, char* argv[])
 	unsigned char c = 0;
 	unsigned char bit7 = 0,bit6= 0,bit5= 0,bit4= 0,bit3= 0,bit2= 0,bit1= 0,bit0= 0;
 	unsigned char arrayBits[7];
-	FILE *fp = NULL;
-	
-	//Commandos maken:
-	if (argc > 1)
-	{	
-		if (strcmp(argv[1], "--help") == 0)
-		{
-			printf("%s\n", "Dit is de uitleg van het programma");
-			return 0;
-		}
-		
-		if (strcmp(argv[1], "-c") == 0 && strcmp(argv[2], "-s") == 0)
-		{
-			fp = fopen(argv[3], "r");
-			
-			if (fp == NULL)
-			{
-				printf("Cant open file");
-				exit(EXIT_FAILURE);
-			}	
-		}		
-	}
 	
 	int i = 7;
 	do
