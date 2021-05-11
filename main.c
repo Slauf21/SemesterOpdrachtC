@@ -10,6 +10,25 @@ void compress(unsigned char *pArrayBits, unsigned char *inputPixels, int i, int 
 
 int main(int argc, char* argv[])
 {
+	//--help commando maken:
+	if (argc > 1)
+	{
+		for (int i = 0; i < argc; i++)
+		{
+			if (strcmp(argv[i], "--help") == 0)
+			{
+				printf("%s\n", "Dit is de uitleg van het programma");
+				return 0;
+			}
+			
+			if (strcmp(argv[i], "-c -s") == 0)
+			{
+				printf("%s\n", "Dit is de uitleg van het programma");
+				return 0;
+			}
+			
+		}
+	}	
 	
 	//--------------------------------------------------------------------------------------------------------------------
 	
@@ -49,7 +68,10 @@ int main(int argc, char* argv[])
 	
     fread(inputPixels, sizeof(unsigned char), imageSize, inputFilePointer); // Lees alle pixels (de rest van de file
     fclose(inputFilePointer);
-	void printPixels(int imageSize ,int inputPixels[]);
+	for(int i = 0; i < imageSize-2; i+=3)
+	{
+		printf("pixel %d: B= %d, G=%d, R=%d\n", i, inputPixels[i], inputPixels[i+1], inputPixels[i+2]);
+	}
    
     fclose(inputFilePointer);
 	
@@ -113,7 +135,10 @@ int main(int argc, char* argv[])
 	}
 	while (!feof(fp));
 	
-	void printPixels(int imageSize ,int inputPixels[]);
+	for(int i = 0; i < imageSize-2; i+=3)
+	{
+		printf("pixel %d: B= %d, G=%d, R=%d\n", i, inputPixels[i], inputPixels[i+1], inputPixels[i+2]);
+	}
 	
 	free(inputPixels);
 	fclose(fp);
