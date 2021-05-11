@@ -7,6 +7,8 @@
 #define BMPINPUTFILE "test.bmp"
 #define SECRETMSG "SecretMessage.txt"
 
+void compress(unsigned char *pArrayBits, unsigned char *inputPixels, int i, int imageSize);
+
 int main(int argc, char* argv[])
 {
 	//--help commando maken:
@@ -75,6 +77,8 @@ int main(int argc, char* argv[])
 	FILE *fp = fopen(SECRETMSG, "r");
 	unsigned char c = 0;
 	unsigned char bit7 = 0,bit6= 0,bit5= 0,bit4= 0,bit3= 0,bit2= 0,bit1= 0,bit0= 0;
+	unsigned char arrayBits[7];
+	
 	if (fp == NULL)
 	{
 		printf("Cant open file");
@@ -85,34 +89,25 @@ int main(int argc, char* argv[])
 	{
 		c = fgetc(fp);		
 		bit7=(c & 0x80)>>7;
+		arrayBits[7] = bit7;
 		bit6=(c & 0x40)>>6;
+		arrayBits[6] = bit6;
 		bit5=(c & 0x20)>>5;
+		arrayBits[5] = bit5;
 		bit4=(c & 0x10)>>4;
+		arrayBits[4] = bit4;
 		bit3=(c & 0x08)>>3;
+		arrayBits[3] = bit3;
 		bit2=(c & 0x04)>>2;
+		arrayBits[2] = bit2;
 		bit1=(c & 0x02)>>1;
+		arrayBits[1] = bit1;
 		bit0=c & 0x01;
+		arrayBits[0] = bit0;
+		
 		printf("%d%d%d%d%d%d%d%d\n", bit7,bit6,bit5,bit4,bit3,bit2,bit1,bit0);
 		
-		//De letter in de pixels zetten
-		if (i < imageSize-2)
-		{	
-			inputPixels[i-7] = (inputPixels[i-7] & 0xFE) | bit7;
-			
-			inputPixels[i-6] = (inputPixels[i-6] & 0xFE) | bit6;
-			
-			inputPixels[i-5] = (inputPixels[i-5] & 0xFE) | bit5;
-			
-			inputPixels[i-4] = (inputPixels[i-4] & 0xFE) | bit4;
-			
-			inputPixels[i-3] = (inputPixels[i-3] & 0xFE) | bit3;
-			
-			inputPixels[i-2] = (inputPixels[i-2] & 0xFE) | bit2;
-			
-			inputPixels[i-1] = (inputPixels[i-1] & 0xFE) | bit1;
-			
-			inputPixels[i] = (inputPixels[i] & 0xFE) | bit0;			
-		}
+		compress(arrayBits,inputPixels,i,imageSize);
 		
 		i += 8;
 	}
@@ -127,4 +122,26 @@ int main(int argc, char* argv[])
 	fclose(fp);
     return 0;
 }
-//gcc -Wall -pedantic main.c -o test
+
+void compress(unsigned char *pArrayBits, unsigned char *inputPixels, int i, int imageSize)
+{
+	//De letter in de pixels zetten
+	if (i < imageSize-2)
+	{	
+		inputPixels[i-7] = (inputPixels[i-7] & 0xFE) | pArrayBits[7];
+		
+		inputPixels[i-6] = (inputPixels[i-6] & 0xFE) | pArrayBits[6];
+
+		inputPixels[i-5] = (inputPixels[i-5] & 0xFE) | pArrayBits[5];
+		
+		inputPixels[i-4] = (inputPixels[i-4] & 0xFE) | pArrayBits[4];
+		
+		inputPixels[i-3] = (inputPixels[i-3] & 0xFE) | pArrayBits[3];
+		
+		inputPixels[i-2] = (inputPixels[i-2] & 0xFE) | pArrayBits[2];
+		
+		inputPixels[i-1] = (inputPixels[i-1] & 0xFE) | pArrayBits[1];
+		
+		inputPixels[i] = (inputPixels[i] & 0xFE) | pArrayBits[0];			
+	}
+}
