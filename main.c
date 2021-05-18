@@ -134,7 +134,6 @@ int main(int argc, char* argv[])
 		
 		i += 8;
 		
-		c = fgetc(fp);
 		binair = (int) c;
 		while (c > 0)
 		{
@@ -154,8 +153,6 @@ int main(int argc, char* argv[])
 				c = c / 2;	
 			}
 		}
-		
-		printf("%d", binair);
 	}
 	while (!feof(fp));
 	
