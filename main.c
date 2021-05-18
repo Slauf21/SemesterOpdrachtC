@@ -40,7 +40,16 @@ int main(int argc, char* argv[])
 				printf("Cant open bmp file");
 				exit(EXIT_FAILURE);
 			}
-		}		
+		}	
+		else if (strcmp(argv[1], "-d") == 0 && strcmp(argv[2], "-i") == 0 && strcmp(argv[4], "-o") == 0)
+		{
+			inputFilePointer = fopen(argv[3], "rb");
+			if (inputFilePointer == NULL)
+			{
+				printf("Cant open bmp file");
+				exit(EXIT_FAILURE);
+			}
+		}
 	}
 
 	else 
