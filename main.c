@@ -26,7 +26,8 @@ int main(int argc, char* argv[])
 		if (strcmp(argv[1], "-c") == 0 && strcmp(argv[2], "-s") == 0 && strcmp(argv[4], "-i") == 0 && strcmp(argv[6], "-o") == 0)
 		{
 			fp = fopen(argv[3], "r");
-			
+			fopen("test.bmp","wb");
+			fopen("outputBMP.bmp","wb");
 			if (fp == NULL)
 			{
 				printf("Cant open txt file");
