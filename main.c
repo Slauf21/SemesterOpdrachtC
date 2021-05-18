@@ -10,25 +10,36 @@ void compress(unsigned char *pArrayBits, unsigned char *inputPixels, int i, int 
 
 int main(int argc, char* argv[])
 {
-	//--help commando maken:
+	FILE *fp = NULL;
+	
+	//Commandos maken:
 	if (argc > 1)
-	{
-		for (int i = 0; i < argc; i++)
+	{	
+		if (strcmp(argv[1], "--help") == 0)
 		{
-			if (strcmp(argv[i], "--help") == 0)
-			{
-				printf("%s\n", "Dit is de uitleg van het programma");
-				return 0;
-			}
-			
-			if (strcmp(argv[i], "-c -s") == 0)
-			{
-				printf("%s\n", "Dit is de uitleg van het programma");
-				return 0;
-			}
-			
+			printf("%s\n", "Input formaten:");
+			printf("%s\n", "Compress: test -c -s inputtxtfile -i inputbmpfile -o outputbmpfile");
+			printf("%s\n", "Decompress: test -d -i inputbmp -o outputtxtfile");
+			return 0;
 		}
-	}	
+		
+		if (strcmp(argv[1], "-c") == 0 && strcmp(argv[2], "-s") == 0)
+		{
+			fp = fopen(argv[3], "r");
+			
+			if (fp == NULL)
+			{
+				printf("Cant open file");
+				exit(EXIT_FAILURE);
+			}	
+		}		
+	}
+
+	else 
+	{
+		printf("%s\n", "Verkeerde input, type --help voor de uitleg.");
+		exit(EXIT_FAILURE);
+	}
 	
 	//--------------------------------------------------------------------------------------------------------------------
 	
@@ -50,6 +61,7 @@ int main(int argc, char* argv[])
 
     unsigned char bmpHeader[54]; // voorzie een array van 54-bytes voor de BMP Header
     fread(bmpHeader, sizeof(unsigned char), 54, inputFilePointer); // lees de 54-byte header
+	
 
     //Informatie uit de header (wikipedia)
     // haal de hoogte en breedte uit de header
@@ -63,50 +75,32 @@ int main(int argc, char* argv[])
 
     int imageSize = 3 * breedte * hoogte; //ieder pixel heeft 3 byte data: rood, groen en blauw (RGB)
     unsigned char* inputPixels = (unsigned char *) calloc(imageSize, sizeof(unsigned char)); // allocate een array voor alle pixels
-	
+	printf("%d", imageSize);
 
 	
     fread(inputPixels, sizeof(unsigned char), imageSize, inputFilePointer); // Lees alle pixels (de rest van de file
     fclose(inputFilePointer);
+	
 	for(int i = 0; i < imageSize-2; i+=3)
 	{
 		printf("pixel %d: B= %d, G=%d, R=%d\n", i, inputPixels[i], inputPixels[i+1], inputPixels[i+2]);
 	}
    
-    fclose(inputFilePointer);
-	
 	printf("\n");
 	
 	//--------------------------------------------------------------------------------------------------------------------
 	
 	//Lezen van de secret message:
 	unsigned char c = 0;
+
 	unsigned char bit7 = 0,bit6= 0,bit5= 0,bit4= 0,bit3= 0,bit2= 0,bit1= 0,bit0= 0;
-	unsigned char arrayBits[7];
-	FILE *fp = NULL;
-	
-	//Commandos maken:
-	if (argc > 1)
-	{	
-		if (strcmp(argv[1], "--help") == 0)
-		{
-			printf("%s\n", "Dit is de uitleg van het programma");
-			return 0;
-		}
-		
-		if (strcmp(argv[1], "-c") == 0 && strcmp(argv[2], "-s") == 0)
-		{
-			fp = fopen(argv[3], "r");
-			
-			if (fp == NULL)
-			{
-				printf("Cant open file");
-				exit(EXIT_FAILURE);
-			}	
-		}		
-	}
-	
+	unsigned char arrayBits[8];
+
+	int binair = 0;
+	unsigned char x = 1;
+
 	int i = 7;
+	
 	do
 	{
 		c = fgetc(fp);		
@@ -132,6 +126,29 @@ int main(int argc, char* argv[])
 		compress(arrayBits,inputPixels,i,imageSize);
 		
 		i += 8;
+		
+		c = fgetc(fp);
+		binair = (int) c;
+		while (c > 0)
+		{
+			if ((c % 2) == 0)
+			{
+				binair = binair << 0;
+				c = c / 2;				
+			}		
+			else
+			{
+				while (binair & x)
+				{
+					binair = binair ^ x;
+					x <<= 1;
+				}				
+				binair = binair ^ x;
+				c = c / 2;	
+			}
+		}
+		
+		printf("%d", binair);
 	}
 	while (!feof(fp));
 	
@@ -140,8 +157,15 @@ int main(int argc, char* argv[])
 		printf("pixel %d: B= %d, G=%d, R=%d\n", i, inputPixels[i], inputPixels[i+1], inputPixels[i+2]);
 	}
 	
+	FILE* outputBMP = NULL;
+	
+	outputBMP = fopen("outputBMP.bmp","wb");
+	
+	fwrite(bmpHeader, sizeof(unsigned char), 54, outputBMP);
+	fwrite(inputPixels, sizeof(unsigned char), imageSize, outputBMP);
 	free(inputPixels);
 	fclose(fp);
+	fclose(outputBMP);
     return 0;
 }
 
