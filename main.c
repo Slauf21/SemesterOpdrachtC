@@ -4,13 +4,13 @@
 
 #define __DEBUG
 
-#define BMPINPUTFILE "test.bmp"
-
 void compress(unsigned char *pArrayBits, unsigned char *inputPixels, int i, int imageSize);
 
 int main(int argc, char* argv[])
 {
 	FILE *fp = NULL;
+	FILE *inputFilePointer = NULL;
+	FILE *outputBMP = NULL;
 	
 	//Commandos maken:
 	if (argc > 1)
@@ -22,16 +22,23 @@ int main(int argc, char* argv[])
 			printf("%s\n", "Decompress: test -d -i inputbmp -o outputtxtfile");
 			return 0;
 		}
-		
-		if (strcmp(argv[1], "-c") == 0 && strcmp(argv[2], "-s") == 0)
+		//We willen compressen
+		if (strcmp(argv[1], "-c") == 0 && strcmp(argv[2], "-s") == 0 && strcmp(argv[4], "-i") == 0 && strcmp(argv[6], "-o") == 0)
 		{
 			fp = fopen(argv[3], "r");
 			
 			if (fp == NULL)
 			{
-				printf("Cant open file");
+				printf("Cant open txt file");
 				exit(EXIT_FAILURE);
 			}	
+			
+			inputFilePointer = fopen(argv[5], "rb");
+			if (inputFilePointer == NULL)
+			{
+				printf("Cant open bmp file");
+				exit(EXIT_FAILURE);
+			}
 		}		
 	}
 
@@ -48,16 +55,7 @@ int main(int argc, char* argv[])
         printf("DEBUG info: BMP transformer\n");
     #endif
 
-    FILE* inputFilePointer = fopen(BMPINPUTFILE, "rb"); //maak een file pointer naar de afbeelding
-    if(inputFilePointer == NULL) //Test of het open van de file gelukt is!
-    {
-        printf("Something went wrong while trying to open %s\n", BMPINPUTFILE);
-        exit(EXIT_FAILURE);
-    }
-
-    #ifdef __DEBUG
-        printf("DEBUG info: Opening File OK: %s\n", BMPINPUTFILE);
-    #endif
+  
 
     unsigned char bmpHeader[54]; // voorzie een array van 54-bytes voor de BMP Header
     fread(bmpHeader, sizeof(unsigned char), 54, inputFilePointer); // lees de 54-byte header
@@ -156,16 +154,16 @@ int main(int argc, char* argv[])
 	{
 		printf("pixel %d: B= %d, G=%d, R=%d\n", i, inputPixels[i], inputPixels[i+1], inputPixels[i+2]);
 	}
-	
-	FILE* outputBMP = NULL;
-	
-	outputBMP = fopen("outputBMP.bmp","wb");
+
+	outputBMP = fopen(argv[7],"wb");
 	
 	fwrite(bmpHeader, sizeof(unsigned char), 54, outputBMP);
 	fwrite(inputPixels, sizeof(unsigned char), imageSize, outputBMP);
+	
 	free(inputPixels);
 	fclose(fp);
 	fclose(outputBMP);
+	
     return 0;
 }
 
