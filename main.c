@@ -101,7 +101,7 @@ int main(int argc, char* argv[])
 	printf("\n");
 	
 	//--------------------------------------------------------------------------------------------------------------------
-	if (R == 1)
+	if (R == 1)//Compress
 	{
 		unsigned char c = 0;
 
@@ -175,43 +175,46 @@ int main(int argc, char* argv[])
 		fclose(fp);
 		fclose(outputBMP);
 	}
-	else if (R == 2)
+	
+	else if (R == 2)//Decompress
 	{
 		unsigned char teller = 0;
-		unsigned char arrayBits[8];
+		unsigned char arrayBits[8] = {0};
 		unsigned char r = 0;
 		unsigned char g = 0;
 		unsigned char b = 0;
-		int letterteller = 0;
+		int letterteller = 1;
 		unsigned char Zin[768] = {0};
 		
 		for (int i = 0; i < imageSize-2; i+=3)//Naar elke pixel kijken
 		{
-			b = inputPixels[i];
+			b = inputPixels[i];//Waarde tussen 0 - 255
 			g = inputPixels[i+1];
 			r = inputPixels[i+2];
 			
-			arrayBits[i] = b;
+			arrayBits[i] = (b & 1);//Eerste bit pakken 01100111 --> 00000001 1
+			
 			teller++;
 			if (teller == 7)//We hebben 8 bits dus een letter
 			{
 				for (int i = 0; i < 8; i++)
 				{
 					Zin[letterteller] += arrayBits[i] << i;//De eerste element van Zin wordt de eerste letter 8 bits.
-				}										
+				}							//10110110			
 				for (int i = 0; i < 8; i++)
 				{
 					arrayBits[i] = 0;//Array leegmaken
 				}
 				if (Zin[letterteller] == 255)//Of de letter 1111111 is
 				{
+					printf("TEST\n");
 					break;
 				}
 				letterteller += 1;//Volgende letter gaan
 				teller = 0;
 			}
 			
-			arrayBits[i+1] = g;
+			arrayBits[i+1] = (g & 1);//11011000 --> 00000000 10
 			teller++;
 			if (teller == 7)
 			{
@@ -225,12 +228,13 @@ int main(int argc, char* argv[])
 				}
 				if (Zin[letterteller] == 255)
 				{
+					printf("TEST\n");
 					break;
 				}
 				letterteller += 1;
 				teller = 0;
 			}
-			arrayBits[i+2] = r;
+			arrayBits[i+2] = (r & 1);//11111111 --> 00000001 101
 			teller++;
 			if (teller == 7)
 			{
@@ -244,15 +248,17 @@ int main(int argc, char* argv[])
 				}
 				if (Zin[letterteller] == 255)
 				{
+					printf("TEST\n");
 					break;
 				}
 				letterteller += 1;
 				teller = 0;
-			}				
+			}	
 		}
+		
 		for (int i = 0; i < letterteller; i++)
 		{
-			printf("TEST\n");
+			
 			printf("%c\n", Zin[i]);
 		}
 		
