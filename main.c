@@ -182,82 +182,81 @@ int main(int argc, char* argv[])
 		unsigned char r = 0;
 		unsigned char g = 0;
 		unsigned char b = 0;
-		int arrayLengte = 1;
-		unsigned char Zin[arrayLengte] = 0;
+		int letterteller = 0;
+		unsigned char Zin[768] = {0};
 		
-		arrayLengte = (int*) malloc(imageSize);
-		
-		do
+		for (int i = 0; i < imageSize-2; i+=3)//Naar elke pixel kijken
 		{
-			for (int i = 0; i < imageSize-2; i+=3)
+			b = inputPixels[i];
+			g = inputPixels[i+1];
+			r = inputPixels[i+2];
+			
+			arrayBits[i] = b;
+			teller++;
+			if (teller == 7)//We hebben 8 bits dus een letter
 			{
-				b = inputPixels[i];
-				g = inputPixels[i+1];
-				r = inputPixels[i+2];
-				
-				arrayBits[i] = b;
-				teller++;
-				if (teller == 7)
+				for (int i = 0; i < 8; i++)
 				{
-					for (int i = 0; i < 8; i++)
-					{
-						Zin[arrayLengte] += arrayBits[i] << i;
-					}
-					for (int i = 0; i < 8; i++)
-					{
-						arrayBits[i] = 0;
-					}
-					if (Zin[arrayLengte] == 255)
-					{
-						break;
-					}
-					arrayLengte += 1;
-				}
-				
-				arrayBits[i+1] = g;
-				teller++;
-				if (teller == 7)
+					Zin[letterteller] += arrayBits[i] << i;//De eerste element van Zin wordt de eerste letter 8 bits.
+				}										
+				for (int i = 0; i < 8; i++)
 				{
-					for (int i = 0; i < 8; i++)
-					{
-						Zin[arrayLengte] += arrayBits[i] << i;
-					}
-					for (int i = 0; i < 8; i++)
-					{
-						arrayBits[i] = 0;
-					}
-					if (Zin[arrayLengte] == 255)
-					{
-						break;
-					}
-					arrayLengte += 1;
+					arrayBits[i] = 0;//Array leegmaken
 				}
-				arrayBits[i+2] = r;
-				teller++;
-				if (teller == 7)
+				if (Zin[letterteller] == 255)//Of de letter 1111111 is
 				{
-					for (int i = 0; i < 8; i++)
-					{
-						Zin[arrayLengte] += arrayBits[i] << i;
-					}
-					for (int i = 0; i < 8; i++)
-					{
-						arrayBits[i] = 0;
-					}
-					if (Zin[arrayLengte] == 255)
-					{
-						break;
-					}
-					arrayLengte += 1;
+					break;
 				}
-				
-				printf("%c", Zin[arrayLengte]);
-				
+				letterteller += 1;//Volgende letter gaan
+				teller = 0;
 			}
+			
+			arrayBits[i+1] = g;
+			teller++;
+			if (teller == 7)
+			{
+				for (int i = 0; i < 8; i++)
+				{
+					Zin[letterteller] += arrayBits[i] << i;
+				}
+				for (int i = 0; i < 8; i++)
+				{
+					arrayBits[i] = 0;
+				}
+				if (Zin[letterteller] == 255)
+				{
+					break;
+				}
+				letterteller += 1;
+				teller = 0;
+			}
+			arrayBits[i+2] = r;
+			teller++;
+			if (teller == 7)
+			{
+				for (int i = 0; i < 8; i++)
+				{
+					Zin[letterteller] += arrayBits[i] << i;
+				}
+				for (int i = 0; i < 8; i++)
+				{
+					arrayBits[i] = 0;
+				}
+				if (Zin[letterteller] == 255)
+				{
+					break;
+				}
+				letterteller += 1;
+				teller = 0;
+			}				
 		}
-		while(1);
+		for (int i = 0; i < letterteller; i++)
+		{
+			printf("TEST\n");
+			printf("%c\n", Zin[i]);
+		}
 		
-		free(arrayLengte);
+		
 	}
 	
 	
