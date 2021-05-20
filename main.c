@@ -198,7 +198,6 @@ int main(int argc, char* argv[])
 			r = inputPixels[i+2];
 			
 			arrayBits[i] = (b & 1);//Eerste bit pakken 01100111 --> 00000001 1
-			
 			teller++;
 			if (teller == 7)//We hebben 8 bits dus een letter
 			{
@@ -259,6 +258,7 @@ int main(int argc, char* argv[])
 				letterteller += 1;
 				teller = 0;
 			}	
+		printf("%d%d%d%d%d%d%d%d\n",arrayBits[i],arrayBits[i+1],arrayBits[i+2],arrayBits[i+3],arrayBits[i+4],arrayBits[i+5],arrayBits[i+6],arrayBits[i+7] );
 		}
 		
 		outputTXT = fopen(argv[5], "w");
