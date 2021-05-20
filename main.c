@@ -19,10 +19,14 @@ int main(int argc, char* argv[])
 	{	
 		if (strcmp(argv[1], "--help") == 0)
 		{
-			printf("%s\n", "Input formaten:");
-			printf("%s\n", "Compress: test -c -s inputtxtfile -i inputbmpfile -o outputbmpfile");
-			printf("%s\n", "Decompress: test -d -i inputbmp -o outputtxtfile");
+			printf("Input formaten:\n");
+			printf("Compress: test -c -s inputtxtfile -i inputbmpfile -o outputbmpfile\n");
+			printf("Decompress: test -d -i inputbmp -o outputtxtfile\n");
 			return 0;
+		}
+		else
+		{
+			printf("Type test --help");
 		}
 		//We willen compressen
 		if (strcmp(argv[1], "-c") == 0 && strcmp(argv[2], "-s") == 0 && strcmp(argv[4], "-i") == 0 && strcmp(argv[6], "-o") == 0)
