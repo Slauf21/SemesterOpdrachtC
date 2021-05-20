@@ -11,6 +11,7 @@ int main(int argc, char* argv[])
 	FILE *fp = NULL;
 	FILE *inputFilePointer = NULL;
 	FILE *outputBMP = NULL;
+	FILE *outputTXT = NULL;
 	unsigned char R = 0;
 	
 	//Commandos maken:
@@ -178,16 +179,19 @@ int main(int argc, char* argv[])
 	
 	else if (R == 2)//Decompress
 	{
+		
 		unsigned char teller = 0;
 		unsigned char arrayBits[8] = {0};
 		unsigned char r = 0;
 		unsigned char g = 0;
 		unsigned char b = 0;
-		int letterteller = 1;
+		int letterteller = 0;
 		unsigned char Zin[768] = {0};
 		
 		for (int i = 0; i < imageSize-2; i+=3)//Naar elke pixel kijken
 		{
+			printf("%d\n",i);
+			printf("%d\n",imageSize-2);
 			b = inputPixels[i];//Waarde tussen 0 - 255
 			g = inputPixels[i+1];
 			r = inputPixels[i+2];
@@ -255,6 +259,10 @@ int main(int argc, char* argv[])
 				teller = 0;
 			}	
 		}
+		
+		outputTXT = fopen(argv[5], "w");
+		
+		fwrite(Zin, sizeof(unsigned char),letterteller,outputTXT);
 		
 		for (int i = 0; i < letterteller; i++)
 		{
