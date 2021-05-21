@@ -6,7 +6,7 @@
 
 void compressBitwise(unsigned char *pArrayBits, unsigned char *inputPixels, int i, int imageSize);
 
-void compress(unsigned char *inputPixels, int imageSize, FILE *fp, unsigned char *bmpHeader);
+void compress(unsigned char *inputPixels, int imageSize, FILE *fp);
 
 int main(int argc, char* argv[])
 {
@@ -110,7 +110,7 @@ int main(int argc, char* argv[])
 	//--------------------------------------------------------------------------------------------------------------------
 	if (R == 1)//Compress
 	{
-		compress(inputPixels, imageSize, fp, bmpHeader);
+		compress(inputPixels, imageSize, fp);
 		
 		outputBMP = fopen(argv[7],"wb");
 	
@@ -220,7 +220,7 @@ int main(int argc, char* argv[])
     return 0;
 }
 
-void compress(unsigned char *inputPixels, int imageSize, FILE *fp, unsigned char *bmpHeader)
+void compress(unsigned char *inputPixels, int imageSize, FILE *fp)
 {
 	unsigned char c = 0;
 
