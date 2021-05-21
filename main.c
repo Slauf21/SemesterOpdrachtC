@@ -317,26 +317,3 @@ int main(int argc, char* argv[])
 	
    
 }
-
-void compress(unsigned char *pArrayBits, unsigned char *inputPixels, int i, int imageSize)
-{
-	//De letter in de pixels zetten
-	if (i < imageSize-2)
-	{	
-		inputPixels[i-7] = (inputPixels[i-7] & 0xFE) | pArrayBits[7];
-		
-		inputPixels[i-6] = (inputPixels[i-6] & 0xFE) | pArrayBits[6];
-
-		inputPixels[i-5] = (inputPixels[i-5] & 0xFE) | pArrayBits[5];
-		
-		inputPixels[i-4] = (inputPixels[i-4] & 0xFE) | pArrayBits[4];
-		
-		inputPixels[i-3] = (inputPixels[i-3] & 0xFE) | pArrayBits[3];
-		
-		inputPixels[i-2] = (inputPixels[i-2] & 0xFE) | pArrayBits[2];
-		
-		inputPixels[i-1] = (inputPixels[i-1] & 0xFE) | pArrayBits[1];
-		
-		inputPixels[i] = (inputPixels[i] & 0xFE) | pArrayBits[0];			
-	}
-}
