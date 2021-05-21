@@ -4,7 +4,9 @@
 
 #define __DEBUG
 
-void compress(unsigned char *pArrayBits, unsigned char *inputPixels, int i, int imageSize);
+void compressBitwise(unsigned char *pArrayBits, unsigned char *inputPixels, int i, int imageSize);
+
+void compress(unsigned char *inputPixels, int imageSize, FILE *fp, unsigned char *bmpHeader);
 
 int main(int argc, char* argv[])
 {
@@ -19,10 +21,14 @@ int main(int argc, char* argv[])
 	{	
 		if (strcmp(argv[1], "--help") == 0)
 		{
-			printf("%s\n", "Input formaten:");
-			printf("%s\n", "Compress: test -c -s inputtxtfile -i inputbmpfile -o outputbmpfile");
-			printf("%s\n", "Decompress: test -d -i inputbmp -o outputtxtfile");
+			printf("Input formaten:\n");
+			printf("Compress: test -c -s inputtxtfile -i inputbmpfile -o outputbmpfile\n");
+			printf("Decompress: test -d -i inputbmp -o outputtxtfile\n");
 			return 0;
+		}
+		else
+		{
+			printf("Type test --help");
 		}
 		//We willen compressen
 		if (strcmp(argv[1], "-c") == 0 && strcmp(argv[2], "-s") == 0 && strcmp(argv[4], "-i") == 0 && strcmp(argv[6], "-o") == 0)
@@ -105,71 +111,10 @@ int main(int argc, char* argv[])
 	//--------------------------------------------------------------------------------------------------------------------
 	if (R == 1)//Compress
 	{
-		unsigned char c = 0;
-
-		unsigned char bit7 = 0,bit6= 0,bit5= 0,bit4= 0,bit3= 0,bit2= 0,bit1= 0,bit0= 0;
-		unsigned char arrayBits[8];
-
-		int binair = 0;
-		unsigned char x = 1;
-
-		int i = 7;
+		compress(inputPixels, imageSize, fp, bmpHeader);
 		
-		do
-		{
-			c = fgetc(fp);		
-			bit7=(c & 0x80)>>7;
-			arrayBits[7] = bit7;
-			bit6=(c & 0x40)>>6;
-			arrayBits[6] = bit6;
-			bit5=(c & 0x20)>>5;
-			arrayBits[5] = bit5;
-			bit4=(c & 0x10)>>4;
-			arrayBits[4] = bit4;
-			bit3=(c & 0x08)>>3;
-			arrayBits[3] = bit3;
-			bit2=(c & 0x04)>>2;
-			arrayBits[2] = bit2;
-			bit1=(c & 0x02)>>1;
-			arrayBits[1] = bit1;
-			bit0=c & 0x01;
-			arrayBits[0] = bit0;
-			
-			printf("%d%d%d%d%d%d%d%d\n", bit7,bit6,bit5,bit4,bit3,bit2,bit1,bit0);
-			
-			compress(arrayBits,inputPixels,i,imageSize);
-			
-			i += 8;
-			
-			binair = (int) c;
-			while (c > 0)
-			{
-				if ((c % 2) == 0)
-				{
-					binair = binair << 0;
-					c = c / 2;				
-				}		
-				else
-				{
-					while (binair & x)
-					{
-						binair = binair ^ x;
-						x <<= 1;
-					}				
-					binair = binair ^ x;
-					c = c / 2;	
-				}
-			}
-		}
-		while (!feof(fp));
-		
-		for(int i = 0; i < imageSize-2; i+=3)
-		{
-			printf("pixel %d: B= %d, G=%d, R=%d\n", i, inputPixels[i], inputPixels[i+1], inputPixels[i+2]);
-		}
-
 		outputBMP = fopen(argv[7],"wb");
-		
+	
 		fwrite(bmpHeader, sizeof(unsigned char), 54, outputBMP);
 		fwrite(inputPixels, sizeof(unsigned char), imageSize, outputBMP);
 		
@@ -266,19 +211,83 @@ int main(int argc, char* argv[])
 		fwrite(Zin, sizeof(unsigned char),letterteller,outputTXT);
 		
 		for (int i = 0; i < letterteller; i++)
-		{
-			
+		{	
 			printf("%c\n", Zin[i]);
 		}
 		
 		
 	}
 	
-	
     return 0;
 }
 
-void compress(unsigned char *pArrayBits, unsigned char *inputPixels, int i, int imageSize)
+void compress(unsigned char *inputPixels, int imageSize, FILE *fp, unsigned char *bmpHeader)
+{
+	unsigned char c = 0;
+
+	unsigned char bit7 = 0,bit6= 0,bit5= 0,bit4= 0,bit3= 0,bit2= 0,bit1= 0,bit0= 0;
+	unsigned char arrayBits[8];
+
+	int binair = 0;
+	unsigned char x = 1;
+
+	int i = 7;
+	
+	do
+	{
+		c = fgetc(fp);		
+		bit7=(c & 0x80)>>7;
+		arrayBits[7] = bit7;
+		bit6=(c & 0x40)>>6;
+		arrayBits[6] = bit6;
+		bit5=(c & 0x20)>>5;
+		arrayBits[5] = bit5;
+		bit4=(c & 0x10)>>4;
+		arrayBits[4] = bit4;
+		bit3=(c & 0x08)>>3;
+		arrayBits[3] = bit3;
+		bit2=(c & 0x04)>>2;
+		arrayBits[2] = bit2;
+		bit1=(c & 0x02)>>1;
+		arrayBits[1] = bit1;
+		bit0=c & 0x01;
+		arrayBits[0] = bit0;
+		
+		printf("%d%d%d%d%d%d%d%d\n", bit7,bit6,bit5,bit4,bit3,bit2,bit1,bit0);
+		
+		compressBitwise(arrayBits,inputPixels,i,imageSize);
+		
+		i += 8;
+		
+		binair = (int) c;
+		while (c > 0)
+		{
+			if ((c % 2) == 0)
+			{
+				binair = binair << 0;
+				c = c / 2;				
+			}		
+			else
+			{
+				while (binair & x)
+				{
+					binair = binair ^ x;
+					x <<= 1;
+				}				
+				binair = binair ^ x;
+				c = c / 2;	
+			}
+		}
+	}
+	while (!feof(fp));
+	
+	for(int i = 0; i < imageSize-2; i+=3)
+	{
+		printf("pixel %d: B= %d, G=%d, R=%d\n", i, inputPixels[i], inputPixels[i+1], inputPixels[i+2]);
+	}
+}
+
+void compressBitwise(unsigned char *pArrayBits, unsigned char *inputPixels, int i, int imageSize)
 {
 	//De letter in de pixels zetten
 	if (i < imageSize-2)
