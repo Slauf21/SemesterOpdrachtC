@@ -122,9 +122,38 @@ int main(int argc, char* argv[])
 		fclose(fp);
 		fclose(outputBMP);
 	}
-	
 	else if (R == 2)//Decompress
 	{
+	decompress(outputTXT,inputPixels,imageSize);
+	}
+    return 0;
+}
+
+void compress(unsigned char *pArrayBits, unsigned char *inputPixels, int i, int imageSize)
+{
+	//De letter in de pixels zetten
+	if (i < imageSize-2)
+	{	
+		inputPixels[i-7] = (inputPixels[i-7] & 0xFE) | pArrayBits[7];
+		
+		inputPixels[i-6] = (inputPixels[i-6] & 0xFE) | pArrayBits[6];
+
+		inputPixels[i-5] = (inputPixels[i-5] & 0xFE) | pArrayBits[5];
+		
+		inputPixels[i-4] = (inputPixels[i-4] & 0xFE) | pArrayBits[4];
+		
+		inputPixels[i-3] = (inputPixels[i-3] & 0xFE) | pArrayBits[3];
+		
+		inputPixels[i-2] = (inputPixels[i-2] & 0xFE) | pArrayBits[2];
+		
+		inputPixels[i-1] = (inputPixels[i-1] & 0xFE) | pArrayBits[1];
+		
+		inputPixels[i] = (inputPixels[i] & 0xFE) | pArrayBits[0];			
+	}
+}
+void decompress(FILE *outputTXT,unsigned char *inputPixels, int imageSize)
+{
+	
 		
 		unsigned char teller = 0;
 		unsigned char arrayBits[8] = {0};
@@ -159,6 +188,7 @@ int main(int argc, char* argv[])
 					printf("TEST\n");
 					break;
 				}
+				printf("[%c]\n",arrayBits[i]+arrayBits[i+1]+arrayBits[i+2]+arrayBits[i+3]+arrayBits[i+4]+arrayBits[i+5]+arrayBits[i+6]+arrayBits[i+7] );
 				letterteller += 1;//Volgende letter gaan
 				teller = 0;
 			}
@@ -180,6 +210,7 @@ int main(int argc, char* argv[])
 					printf("TEST\n");
 					break;
 				}
+				printf("[%c]\n",arrayBits[i]+arrayBits[i+1]+arrayBits[i+2]+arrayBits[i+3]+arrayBits[i+4]+arrayBits[i+5]+arrayBits[i+6]+arrayBits[i+7] );
 				letterteller += 1;
 				teller = 0;
 			}
@@ -200,10 +231,11 @@ int main(int argc, char* argv[])
 					printf("TEST\n");
 					break;
 				}
+				printf("[%c]\n",arrayBits[i]+arrayBits[i+1]+arrayBits[i+2]+arrayBits[i+3]+arrayBits[i+4]+arrayBits[i+5]+arrayBits[i+6]+arrayBits[i+7] );
 				letterteller += 1;
 				teller = 0;
 			}	
-		printf("%d%d%d%d%d%d%d%d\n",arrayBits[i],arrayBits[i+1],arrayBits[i+2],arrayBits[i+3],arrayBits[i+4],arrayBits[i+5],arrayBits[i+6],arrayBits[i+7] );
+		
 		}
 		
 		outputTXT = fopen(argv[5], "w");
@@ -215,8 +247,6 @@ int main(int argc, char* argv[])
 			printf("%c\n", Zin[i]);
 		}
 		
-		
-	}
 	
     return 0;
 }
