@@ -35,8 +35,8 @@ int main(int argc, char* argv[])
 		{
 			R = 1;
 			fp = fopen(argv[3], "r");
-			fopen("argv[5]","wb");
-			fopen("argv[7]","wb");
+			fopen(argv[5],"wb");
+			fopen(argv[7],"wb");
 			if (fp == NULL)
 			{
 				printf("Cant open txt file");
