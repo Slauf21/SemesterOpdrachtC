@@ -124,39 +124,8 @@ int main(int argc, char* argv[])
 	}
 	else if (R == 2)//Decompress
 	{
-	decompress(outputTXT,inputPixels,imageSize);
-	}
-    return 0;
-}
-
-void compress(unsigned char *pArrayBits, unsigned char *inputPixels, int i, int imageSize)
-{
-	//De letter in de pixels zetten
-	if (i < imageSize-2)
-	{	
-		inputPixels[i-7] = (inputPixels[i-7] & 0xFE) | pArrayBits[7];
-		
-		inputPixels[i-6] = (inputPixels[i-6] & 0xFE) | pArrayBits[6];
-
-		inputPixels[i-5] = (inputPixels[i-5] & 0xFE) | pArrayBits[5];
-		
-		inputPixels[i-4] = (inputPixels[i-4] & 0xFE) | pArrayBits[4];
-		
-		inputPixels[i-3] = (inputPixels[i-3] & 0xFE) | pArrayBits[3];
-		
-		inputPixels[i-2] = (inputPixels[i-2] & 0xFE) | pArrayBits[2];
-		
-		inputPixels[i-1] = (inputPixels[i-1] & 0xFE) | pArrayBits[1];
-		
-		inputPixels[i] = (inputPixels[i] & 0xFE) | pArrayBits[0];			
-	}
-}
-void decompress(FILE *outputTXT,unsigned char *inputPixels, int imageSize)
-{
-	
-		
 		unsigned char teller = 0;
-		unsigned char arrayBits[8] = {0};
+		unsigned char arrayBits[8] = {0,0,0,0,0,0,0,0};
 		unsigned char r = 0;
 		unsigned char g = 0;
 		unsigned char b = 0;
@@ -175,20 +144,20 @@ void decompress(FILE *outputTXT,unsigned char *inputPixels, int imageSize)
 			teller++;
 			if (teller == 7)//We hebben 8 bits dus een letter
 			{
-				for (int i = 0; i < 8; i++)
+				for (int j = 0; j < 8; i++)
 				{
-					Zin[letterteller] += arrayBits[i] << i;//De eerste element van Zin wordt de eerste letter 8 bits.
+					Zin[letterteller] += arrayBits[j] << j;//De eerste element van Zin wordt de eerste letter 8 bits.
 				}							//10110110			
-				for (int i = 0; i < 8; i++)
+				for (int j = 0; j < 8; j++)
 				{
-					arrayBits[i] = 0;//Array leegmaken
+					arrayBits[j] = 0;//Array leegmaken
 				}
 				if (Zin[letterteller] == 255)//Of de letter 1111111 is
 				{
 					printf("TEST\n");
 					break;
 				}
-				printf("[%c]\n",arrayBits[i]+arrayBits[i+1]+arrayBits[i+2]+arrayBits[i+3]+arrayBits[i+4]+arrayBits[i+5]+arrayBits[i+6]+arrayBits[i+7] );
+				//printf("[%c]\n",arrayBits[i]+arrayBits[i+1]+arrayBits[i+2]+arrayBits[i+3]+arrayBits[i+4]+arrayBits[i+5]+arrayBits[i+6]+arrayBits[i+7] );
 				letterteller += 1;//Volgende letter gaan
 				teller = 0;
 			}
@@ -197,20 +166,19 @@ void decompress(FILE *outputTXT,unsigned char *inputPixels, int imageSize)
 			teller++;
 			if (teller == 7)
 			{
-				for (int i = 0; i < 8; i++)
+				for (int j = 0; j < 8; j++)
 				{
-					Zin[letterteller] += arrayBits[i] << i;
+					Zin[letterteller] += arrayBits[j] << j;
 				}
-				for (int i = 0; i < 8; i++)
+				for (int j = 0; j < 8; j++)
 				{
-					arrayBits[i] = 0;
+					arrayBits[j] = 0;
 				}
 				if (Zin[letterteller] == 255)
 				{
 					printf("TEST\n");
 					break;
 				}
-				printf("[%c]\n",arrayBits[i]+arrayBits[i+1]+arrayBits[i+2]+arrayBits[i+3]+arrayBits[i+4]+arrayBits[i+5]+arrayBits[i+6]+arrayBits[i+7] );
 				letterteller += 1;
 				teller = 0;
 			}
@@ -218,36 +186,35 @@ void decompress(FILE *outputTXT,unsigned char *inputPixels, int imageSize)
 			teller++;
 			if (teller == 7)
 			{
-				for (int i = 0; i < 8; i++)
+				for (int j = 0; j < 8; j++)
 				{
-					Zin[letterteller] += arrayBits[i] << i;
+					Zin[letterteller] += arrayBits[j] << j;
 				}
-				for (int i = 0; i < 8; i++)
+				for (int j = 0; j < 8; j++)
 				{
-					arrayBits[i] = 0;
+					arrayBits[j] = 0;
 				}
 				if (Zin[letterteller] == 255)
 				{
 					printf("TEST\n");
 					break;
 				}
-				printf("[%c]\n",arrayBits[i]+arrayBits[i+1]+arrayBits[i+2]+arrayBits[i+3]+arrayBits[i+4]+arrayBits[i+5]+arrayBits[i+6]+arrayBits[i+7] );
+			
 				letterteller += 1;
 				teller = 0;
 			}	
 		
 		}
-		
-		outputTXT = fopen(argv[5], "w");
+	
+	outputTXT = fopen(argv[5], "w");
 		
 		fwrite(Zin, sizeof(unsigned char),letterteller,outputTXT);
-		
+		printf("%c\n", Zin[1]);
 		for (int i = 0; i < letterteller; i++)
 		{	
 			printf("%c\n", Zin[i]);
 		}
-		
-	
+	}
     return 0;
 }
 
