@@ -195,15 +195,12 @@ int main(int argc, char* argv[])
 		unsigned char g = 0;
 		unsigned char b = 0;
 		int letterteller = 0;
-		//unsigned char Zin[768] = {0};
 		int arrayTeller = 0;
 		int temp = 0;
 		unsigned char* Zin = (unsigned char *) calloc(imageSize, sizeof(unsigned char));
 		
 		for (int i = 0; i < imageSize-2; i+=3)//Naar elke pixel kijken
-		{
-			//printf("%d\n",i);
-			
+		{			
 			b = inputPixels[i];//Waarde tussen 0 - 255
 			g = inputPixels[i+1];
 			r = inputPixels[i+2];
@@ -224,13 +221,7 @@ int main(int argc, char* argv[])
 			{
 				for (int j = 0; j < 8; j++)
 				{
-					printf("bits %d: %d\n",j, arrayBits[j]);
-				}
-				
-				for (int j = 0; j < 8; j++)
-				{
 					Zin[letterteller] += arrayBits[j] << (7 - j);//De eerste element van Zin wordt de eerste letter 8 bits.	
-					printf("%d\n", Zin[letterteller]);
 				}		
 				
 				for (int j = 0; j < 8; j++)
@@ -239,7 +230,6 @@ int main(int argc, char* argv[])
 				}
 				if (Zin[letterteller] == 255)//Of de letter 1111111 is
 				{
-					printf("TEST\n");
 					break;
 				}
 				letterteller += 1;//Volgende letter gaan
@@ -263,7 +253,6 @@ int main(int argc, char* argv[])
 				for (int j = 0; j < 8; j++)
 				{
 					Zin[letterteller] += arrayBits[j] << (7 - j);
-					printf("%d\n", Zin[letterteller]);
 				}
 				for (int j = 0; j < 8; j++)
 				{
@@ -271,7 +260,6 @@ int main(int argc, char* argv[])
 				}
 				if (Zin[letterteller] == 255)
 				{
-					printf("TEST\n");
 					break;
 				}
 				letterteller += 1;
@@ -294,7 +282,6 @@ int main(int argc, char* argv[])
 				for (int j = 0; j < 8; j++)
 				{
 					Zin[letterteller] += arrayBits[j] << (7 - j);
-					printf("%d\n", Zin[letterteller]);
 				}
 				for (int j = 0; j < 8; j++)
 				{
@@ -302,7 +289,6 @@ int main(int argc, char* argv[])
 				}
 				if (Zin[letterteller] == 255)
 				{
-					printf("TEST\n");
 					break;
 				}
 				letterteller += 1;
@@ -314,10 +300,6 @@ int main(int argc, char* argv[])
 		
 		fwrite(Zin, sizeof(unsigned char),letterteller,outputTXT);
 		
-		for (int i = 0; i < letterteller; i++)
-		{
-			printf("%c\n", Zin[i]);
-		}	
 		fclose(outputTXT);
 		free(inputPixels);
 		free(Zin);
