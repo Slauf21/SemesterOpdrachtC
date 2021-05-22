@@ -190,24 +190,26 @@ int main(int argc, char* argv[])
 	else if (R == 2)//Decompress
 	{
 		unsigned char teller = 0;
-		unsigned char arrayBits[8] = {0,0,0,0,0,0,0,0};
+		unsigned char arrayBits[8] = {0};
 		unsigned char r = 0;
 		unsigned char g = 0;
 		unsigned char b = 0;
 		int letterteller = 0;
 		//unsigned char Zin[768] = {0};
 		int arrayTeller = 0;
+		int temp = 0;
 		unsigned char* Zin = (unsigned char *) calloc(imageSize, sizeof(unsigned char));
 		
 		for (int i = 0; i < imageSize-2; i+=3)//Naar elke pixel kijken
 		{
 			//printf("%d\n",i);
-
+			
 			b = inputPixels[i];//Waarde tussen 0 - 255
 			g = inputPixels[i+1];
 			r = inputPixels[i+2];
 			
 			arrayBits[arrayTeller] = (b & 1);//Eerste bit pakken 01100111 --> 00000001 1
+
 			if (arrayTeller == 7)
 			{
 				arrayTeller = 0;
@@ -218,12 +220,19 @@ int main(int argc, char* argv[])
 			}
 			
 			teller++;
-			if (teller == 7)//We hebben 8 bits dus een letter
+			if (teller == 8)//We hebben 8 bits dus een letter
 			{
 				for (int j = 0; j < 8; j++)
 				{
-					Zin[letterteller] += arrayBits[j] << j;//De eerste element van Zin wordt de eerste letter 8 bits.
-				}							//10110110			
+					printf("bits %d: %d\n",j, arrayBits[j]);
+				}
+				
+				for (int j = 0; j < 8; j++)
+				{
+					Zin[letterteller] += arrayBits[j] << (7 - j);//De eerste element van Zin wordt de eerste letter 8 bits.	
+					printf("%d\n", Zin[letterteller]);
+				}		
+				
 				for (int j = 0; j < 8; j++)
 				{
 					arrayBits[j] = 0;//Array leegmaken
@@ -237,7 +246,8 @@ int main(int argc, char* argv[])
 				teller = 0;
 			}
 			
-			arrayBits[arrayTeller] = (g & 1);//11011000 --> 00000000 10
+			arrayBits[arrayTeller] = (g & 1);//Eerste bit pakken 01100111 --> 00000001 
+
 			if (arrayTeller == 7)
 			{
 				arrayTeller = 0;
@@ -248,11 +258,12 @@ int main(int argc, char* argv[])
 			}
 			
 			teller++;
-			if (teller == 7)
+			if (teller == 8)
 			{
 				for (int j = 0; j < 8; j++)
 				{
-					Zin[letterteller] += arrayBits[j] << j;
+					Zin[letterteller] += arrayBits[j] << (7 - j);
+					printf("%d\n", Zin[letterteller]);
 				}
 				for (int j = 0; j < 8; j++)
 				{
@@ -266,7 +277,8 @@ int main(int argc, char* argv[])
 				letterteller += 1;
 				teller = 0;
 			}
-			arrayBits[arrayTeller] = (r & 1);//11111111 --> 00000001 101
+			arrayBits[arrayTeller] = (r & 1);//Eerste bit pakken 01100111 --> 00000001 1
+
 			if (arrayTeller == 7)
 			{
 				arrayTeller = 0;
@@ -277,11 +289,12 @@ int main(int argc, char* argv[])
 			}
 			
 			teller++;
-			if (teller == 7)
+			if (teller == 8)
 			{
 				for (int j = 0; j < 8; j++)
 				{
-					Zin[letterteller] += arrayBits[j] << j;
+					Zin[letterteller] += arrayBits[j] << (7 - j);
+					printf("%d\n", Zin[letterteller]);
 				}
 				for (int j = 0; j < 8; j++)
 				{
@@ -295,10 +308,6 @@ int main(int argc, char* argv[])
 				letterteller += 1;
 				teller = 0;
 			}
-			
-			/*printf("%d\n",arrayBits[i]);
-			printf("%d\n",arrayBits[i + 1]);
-			printf("%d\n",arrayBits[i + 2]);*/
 		}
 		
 		outputTXT = fopen(argv[5], "w");
@@ -307,9 +316,9 @@ int main(int argc, char* argv[])
 		
 		for (int i = 0; i < letterteller; i++)
 		{
-			//printf("%c\n", Zin[i]);
+			printf("%c\n", Zin[i]);
 		}	
-		
+		fclose(outputTXT);
 		free(inputPixels);
 		free(Zin);
 		return 0;		
