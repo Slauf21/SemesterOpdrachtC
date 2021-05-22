@@ -4,8 +4,8 @@
  
 #define __DEBUG 
  
-void compress(unsigned char *pArrayBits, unsigned char *inputPixels, int i, int imageSize); 
- 
+void compressBitwise(unsigned char *pArrayBits, unsigned char *inputPixels, int i, int imageSize); 
+void compress(unsigned char *inputPixels, int imageSize, FILE *fp); 
 int main(int argc, char* argv[]) 
 { 
 	 
@@ -112,7 +112,150 @@ int main(int argc, char* argv[])
      
 	if (R == 1)//Compress 
 	{ 
-		unsigned char c = 0; 
+
+		compress(inputPixels, imageSize, fp);
+		
+		compressed = fopen(argv[7],"wb"); 
+		 
+		fwrite(bmpHeader, sizeof(unsigned char), 54, compressed); 
+		fwrite(inputPixels, sizeof(unsigned char), imageSize, compressed); 
+		 
+		free(inputPixels); 
+		fclose(fp); 
+		fclose(compressed); 
+		 
+		return 0; 
+	} 
+	 
+	else if (R == 2)//Decompress 
+	{ 
+		unsigned char teller = 0; 
+		unsigned char arrayBits[8] = {0}; 
+		unsigned char r = 0; 
+		unsigned char g = 0; 
+		unsigned char b = 0; 
+		int letterteller = 0; 
+		int arrayTeller = 0; 
+		unsigned char* Zin = (unsigned char *) calloc(imageSize, sizeof(unsigned char)); 
+		 
+		for (int i = 0; i < imageSize-2; i+=3)//Naar elke pixel kijken 
+		{ 
+			 
+			b = inputPixels[i];//Waarde tussen 0 - 255 
+			g = inputPixels[i+1]; 
+			r = inputPixels[i+2]; 
+			 
+			arrayBits[arrayTeller] = (b & 1);//Eerste bit pakken 01100111 --> 00000001 1 
+ 
+			if (arrayTeller == 7) 
+			{ 
+				arrayTeller = 0; 
+			} 
+			else 
+			{ 
+				arrayTeller++; 
+			} 
+			 
+			teller++; 
+			if (teller == 8)//We hebben 8 bits dus een letter 
+			{ 
+				for (int j = 0; j < 8; j++) 
+				{ 
+					Zin[letterteller] += arrayBits[j] << (7 - j);//De eerste element van Zin wordt de eerste letter 8 bits.	
+				}		 
+				 
+				for (int j = 0; j < 8; j++) 
+				{ 
+					arrayBits[j] = 0;//Array leegmaken 
+				} 
+				if (Zin[letterteller] == 255)//Of de letter 1111111 is 
+				{ 
+					break; 
+				} 
+				letterteller += 1;//Volgende letter gaan 
+				teller = 0; 
+			} 
+			 
+			arrayBits[arrayTeller] = (g & 1);//Eerste bit pakken 01100111 --> 00000001  
+ 
+			if (arrayTeller == 7) 
+			{ 
+				arrayTeller = 0; 
+			} 
+			else 
+			{ 
+				arrayTeller++; 
+			} 
+			 
+			teller++; 
+			if (teller == 8) 
+			{ 
+				for (int j = 0; j < 8; j++) 
+				{ 
+					Zin[letterteller] += arrayBits[j] << (7 - j); 
+				} 
+				for (int j = 0; j < 8; j++) 
+				{ 
+					arrayBits[j] = 0; 
+				} 
+				if (Zin[letterteller] == 255) 
+				{ 
+					break; 
+				} 
+				letterteller += 1; 
+				teller = 0; 
+			} 
+			arrayBits[arrayTeller] = (r & 1);//Eerste bit pakken 01100111 --> 00000001 1 
+ 
+			if (arrayTeller == 7) 
+			{ 
+				arrayTeller = 0; 
+			} 
+			else 
+			{ 
+				arrayTeller++; 
+			} 
+			 
+			teller++; 
+			if (teller == 8) 
+			{ 
+				for (int j = 0; j < 8; j++) 
+				{ 
+					Zin[letterteller] += arrayBits[j] << (7 - j); 
+				} 
+				for (int j = 0; j < 8; j++) 
+				{ 
+					arrayBits[j] = 0; 
+				} 
+				if (Zin[letterteller] == 255) 
+				{ 
+					break; 
+				} 
+				letterteller += 1; 
+				teller = 0; 
+			} 
+		} 
+		 
+		outputTXT = fopen(argv[5], "w"); 
+		 
+		fwrite(Zin, sizeof(unsigned char),letterteller,outputTXT); 
+		 
+		
+			printf("%s", Zin); 
+		
+		fclose(outputTXT); 
+		free(inputPixels); 
+		free(Zin); 
+		return 0;		 
+	} 
+	 
+    
+} 
+ 
+
+void compress(unsigned char *inputPixels, int imageSize, FILE *fp) 
+{
+			unsigned char c = 0; 
  
 		unsigned char bit7 = 0,bit6= 0,bit5= 0,bit4= 0,bit3= 0,bit2= 0,bit1= 0,bit0= 0; 
 		unsigned char arrayBits[8]; 
@@ -144,7 +287,7 @@ int main(int argc, char* argv[])
 			 
 			printf("%d%d%d%d%d%d%d%d\n", bit7,bit6,bit5,bit4,bit3,bit2,bit1,bit0); 
 			 
-			compress(arrayBits,inputPixels,i,imageSize); 
+			compressBitwise(arrayBits,inputPixels,i,imageSize); 
 			 
 			i += 8; 
 			 
@@ -174,359 +317,26 @@ int main(int argc, char* argv[])
 		{ 
 			printf("pixel %d: B= %d, G=%d, R=%d\n", i, inputPixels[i], inputPixels[i+1], inputPixels[i+2]); 
 		} 
+}
+void compressBitwise(unsigned char *pArrayBits, unsigned char *inputPixels, int i, int imageSize) 
+{ 
+	//De letter in de pixels zetten 
+	if (i < imageSize-2) 
+	{	 
+		inputPixels[i-7] = (inputPixels[i-7] & 0xFE) | pArrayBits[7]; 
 		 
-		compressed = fopen(argv[7],"wb"); 
-		 
-		fwrite(bmpHeader, sizeof(unsigned char), 54, compressed); 
-		fwrite(inputPixels, sizeof(unsigned char), imageSize, compressed); 
-		 
-		free(inputPixels); 
-		fclose(fp); 
-		fclose(compressed); 
-		 
-		return 0; 
-	} 
-	 
-	else if (R == 2)//Decompress 
-	{ 
-		unsigned char teller = 0; 
-		unsigned char arrayBits[8] = {0,0,0,0,0,0,0,0}; 
-		unsigned char r = 0; 
-		unsigned char g = 0; 
-		unsigned char b = 0; 
-		int letterteller = 0; 
-		//unsigned char Zin[768] = {0}; 
-		int arrayTeller = 0; 
-		unsigned char* Zin = (unsigned char *) calloc(imageSize, sizeof(unsigned char)); 
-		 
-		for (int i = 0; i < imageSize-2; i+=3)//Naar elke pixel kijken 
-		{ 
-			//printf("%d\n",i); 
+		inputPixels[i-6] = (inputPixels[i-6] & 0xFE) | pArrayBits[6]; 
  
-			b = inputPixels[i];//Waarde tussen 0 - 255 
-			g = inputPixels[i+1]; 
-			r = inputPixels[i+2]; 
-			 
-			arrayBits[arrayTeller] = (b & 1);//Eerste bit pakken 01100111 --> 00000001 1 
-			if (arrayTeller == 7) 
-			{ 
-				arrayTeller = 0; 
-			} 
-			else 
-			{ 
-				arrayTeller++; 
-			} 
-			 
-			teller++; 
-			if (teller == 7)//We hebben 8 bits dus een letter 
-			{ 
-				for (int j = 0; j < 8; j++) 
-				{ 
-					Zin[letterteller] += arrayBits[j] << (7-j);//De eerste element van Zin wordt de eerste letter 8 bits. 
-				}							//10110110			 
-				for (int j = 0; j < 8; j++) 
-				{ 
-					arrayBits[j] = 0;//Array leegmaken 
-				} 
-				if (Zin[letterteller] >= 255)//Of de letter 11111111 is 
-				{ 
-					printf("TEST\n"); 
-					break; 
-				} 
-				letterteller += 1;//Volgende letter gaan 
-				teller = 0; 
-			} 
-			 
-			arrayBits[arrayTeller] = (g & 1);//11011000 --> 00000000 10 
-			if (arrayTeller == 7) 
-			{ 
-				arrayTeller = 0; 
-			} 
-			else 
-			{ 
-				arrayTeller++; 
-			} 
-			 
-			teller++; 
-			if (teller == 7) 
-			{ 
-				for (int j = 0; j < 8; j++) 
-				{ 
-					Zin[letterteller] += arrayBits[j] << (7-j); 
-				} 
-				for (int j = 0; j < 8; j++) 
-				{ 
-					arrayBits[j] = 0; 
-				} 
-				if (Zin[letterteller] >= 255) 
-				{ 
-					printf("TEST\n"); 
-					break; 
-				} 
-				letterteller += 1; 
-				teller = 0; 
-			} 
-			arrayBits[arrayTeller] = (r & 1);//11111111 --> 00000001 101 
-			if (arrayTeller == 7) 
-			{ 
-				arrayTeller = 0; 
-			} 
-			else 
-			{ 
-				arrayTeller++; 
-			} 
-			 
-			teller++; 
-			if (teller == 7) 
-			{ 
-				for (int j = 0; j < 8; j++) 
-				{ 
-					Zin[letterteller] += arrayBits[j] << (7-j); 
-				} 
-				for (int j = 0; j < 8; j++) 
-				{ 
-					arrayBits[j] = 0; 
-				} 
-				if (Zin[letterteller] >= 255) 
-				{ 
-					printf("TEST\n"); 
-					break; 
-				} 
-				letterteller += 1; 
-				teller = 0; 
-			} 
-			 
-			/*printf("%d\n",arrayBits[i]); 
-			printf("%d\n",arrayBits[i + 1]); 
-			printf("%d\n",arrayBits[i + 2]);*/ 
-		} 
+		inputPixels[i-5] = (inputPixels[i-5] & 0xFE) | pArrayBits[5]; 
 		 
-		outputTXT = fopen(argv[5], "w"); 
+		inputPixels[i-4] = (inputPixels[i-4] & 0xFE) | pArrayBits[4]; 
 		 
-		fwrite(Zin, sizeof(unsigned char),letterteller,outputTXT); 
+		inputPixels[i-3] = (inputPixels[i-3] & 0xFE) | pArrayBits[3]; 
 		 
-		
-			printf("%s", Zin); 
+		inputPixels[i-2] = (inputPixels[i-2] & 0xFE) | pArrayBits[2]; 
 		 
-		free(inputPixels); 
-		free(Zin); 
-		return 0;		 
+		inputPixels[i-1] = (inputPixels[i-1] & 0xFE) | pArrayBits[1]; 
+		 
+		inputPixels[i] = (inputPixels[i] & 0xFE) | pArrayBits[0];			 
 	} 
-	 
-    
-	if (R == 1)//Compress
-	{
-		unsigned char c = 0;
-
-		unsigned char bit7 = 0,bit6= 0,bit5= 0,bit4= 0,bit3= 0,bit2= 0,bit1= 0,bit0= 0;
-		unsigned char arrayBits[8];
-
-		int binair = 0;
-		unsigned char x = 1;
-
-		int i = 7;
-		
-		do
-		{
-			c = fgetc(fp);		
-			bit7=(c & 0x80)>>7;
-			arrayBits[7] = bit7;
-			bit6=(c & 0x40)>>6;
-			arrayBits[6] = bit6;
-			bit5=(c & 0x20)>>5;
-			arrayBits[5] = bit5;
-			bit4=(c & 0x10)>>4;
-			arrayBits[4] = bit4;
-			bit3=(c & 0x08)>>3;
-			arrayBits[3] = bit3;
-			bit2=(c & 0x04)>>2;
-			arrayBits[2] = bit2;
-			bit1=(c & 0x02)>>1;
-			arrayBits[1] = bit1;
-			bit0=c & 0x01;
-			arrayBits[0] = bit0;
-			
-			printf("%d%d%d%d%d%d%d%d\n", bit7,bit6,bit5,bit4,bit3,bit2,bit1,bit0);
-			
-			compress(arrayBits,inputPixels,i,imageSize);
-			
-			i += 8;
-			
-			binair = (int) c;
-			while (c > 0)
-			{
-				if ((c % 2) == 0)
-				{
-					binair = binair << 0;
-					c = c / 2;				
-				}		
-				else
-				{
-					while (binair & x)
-					{
-						binair = binair ^ x;
-						x <<= 1;
-					}				
-					binair = binair ^ x;
-					c = c / 2;	
-				}
-			}
-		}
-		while (!feof(fp));
-		
-		for(int i = 0; i < imageSize-2; i+=3)
-		{
-			printf("pixel %d: B= %d, G=%d, R=%d\n", i, inputPixels[i], inputPixels[i+1], inputPixels[i+2]);
-		}
-		
-		compressed = fopen(argv[7],"wb");
-		
-		fwrite(bmpHeader, sizeof(unsigned char), 54, compressed);
-		fwrite(inputPixels, sizeof(unsigned char), imageSize, compressed);
-		
-		free(inputPixels);
-		fclose(fp);
-		fclose(compressed);
-		
-		return 0;
-	}
-	
-	else if (R == 2)//Decompress
-	{
-		unsigned char teller = 0;
-		unsigned char arrayBits[8] = {0};
-		unsigned char r = 0;
-		unsigned char g = 0;
-		unsigned char b = 0;
-		int letterteller = 0;
-		//unsigned char Zin[768] = {0};
-		int arrayTeller = 0;
-		int temp = 0;
-		unsigned char* Zin = (unsigned char *) calloc(imageSize, sizeof(unsigned char));
-		
-		for (int i = 0; i < imageSize-2; i+=3)//Naar elke pixel kijken
-		{
-			//printf("%d\n",i);
-			
-			b = inputPixels[i];//Waarde tussen 0 - 255
-			g = inputPixels[i+1];
-			r = inputPixels[i+2];
-			
-			arrayBits[arrayTeller] = (b & 1);//Eerste bit pakken 01100111 --> 00000001 1
-
-			if (arrayTeller == 7)
-			{
-				arrayTeller = 0;
-			}
-			else
-			{
-				arrayTeller++;
-			}
-			
-			teller++;
-			if (teller == 8)//We hebben 8 bits dus een letter
-			{
-				for (int j = 0; j < 8; j++)
-				{
-					printf("bits %d: %d\n",j, arrayBits[j]);
-				}
-				
-				for (int j = 0; j < 8; j++)
-				{
-					Zin[letterteller] += arrayBits[j] << (7 - j);//De eerste element van Zin wordt de eerste letter 8 bits.	
-					printf("%d\n", Zin[letterteller]);
-				}		
-				
-				for (int j = 0; j < 8; j++)
-				{
-					arrayBits[j] = 0;//Array leegmaken
-				}
-				if (Zin[letterteller] == 255)//Of de letter 1111111 is
-				{
-					printf("TEST\n");
-					break;
-				}
-				letterteller += 1;//Volgende letter gaan
-				teller = 0;
-			}
-			
-			arrayBits[arrayTeller] = (g & 1);//Eerste bit pakken 01100111 --> 00000001 
-
-			if (arrayTeller == 7)
-			{
-				arrayTeller = 0;
-			}
-			else
-			{
-				arrayTeller++;
-			}
-			
-			teller++;
-			if (teller == 8)
-			{
-				for (int j = 0; j < 8; j++)
-				{
-					Zin[letterteller] += arrayBits[j] << (7 - j);
-					printf("%d\n", Zin[letterteller]);
-				}
-				for (int j = 0; j < 8; j++)
-				{
-					arrayBits[j] = 0;
-				}
-				if (Zin[letterteller] == 255)
-				{
-					printf("TEST\n");
-					break;
-				}
-				letterteller += 1;
-				teller = 0;
-			}
-			arrayBits[arrayTeller] = (r & 1);//Eerste bit pakken 01100111 --> 00000001 1
-
-			if (arrayTeller == 7)
-			{
-				arrayTeller = 0;
-			}
-			else
-			{
-				arrayTeller++;
-			}
-			
-			teller++;
-			if (teller == 8)
-			{
-				for (int j = 0; j < 8; j++)
-				{
-					Zin[letterteller] += arrayBits[j] << (7 - j);
-					printf("%d\n", Zin[letterteller]);
-				}
-				for (int j = 0; j < 8; j++)
-				{
-					arrayBits[j] = 0;
-				}
-				if (Zin[letterteller] == 255)
-				{
-					printf("TEST\n");
-					break;
-				}
-				letterteller += 1;
-				teller = 0;
-			}
-		}
-		
-		outputTXT = fopen(argv[5], "w");
-		
-		fwrite(Zin, sizeof(unsigned char),letterteller,outputTXT);
-		
-		for (int i = 0; i < letterteller; i++)
-		{
-			printf("%c\n", Zin[i]);
-		}	
-		fclose(outputTXT);
-		free(inputPixels);
-		free(Zin);
-		return 0;		
-	}
-	
-   
 }
