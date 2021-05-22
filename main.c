@@ -7,7 +7,7 @@
 void compressBitwise(unsigned char *pArrayBits, unsigned char *inputPixels, int i, int imageSize);  
 void compress(unsigned char *inputPixels, int imageSize, FILE *fp);  
 int decompress(int imageSize, int letterteller, unsigned char *inputPixels, unsigned char* Zin); 
- 
+int tellerControle(int arrayTeller); 
 int main(int argc, char* argv[])  
 {  
 	//Files op NULL initialiseren
@@ -162,8 +162,8 @@ void compress(unsigned char *inputPixels, int imageSize, FILE *fp)
 	unsigned char c = 0;  
 	unsigned char bit7 = 0,bit6= 0,bit5= 0,bit4= 0,bit3= 0,bit2= 0,bit1= 0,bit0= 0;  
 	unsigned char arrayBits[8];  
-	int binair = 0;  
-	unsigned char x = 1;  
+ 
+ 
 	int i = 7;  
 	 
 	do  
@@ -195,25 +195,7 @@ void compress(unsigned char *inputPixels, int imageSize, FILE *fp)
 		
 		i += 8;  
 		
-		binair = (int) c;  
-		while (c > 0)  
-		{  
-			if ((c % 2) == 0)  
-			{  
-				binair = binair << 0; //0 keer shift??? 
-				c = c / 2;				  
-			}		  
-			else  
-			{  
-				while (binair & x)  
-				{  
-					binair = binair ^ x;  
-					x <<= 1;  
-				}				  
-				binair = binair ^ x;  
-				c = c / 2;	  
-			}  
-		}  
+		
 	}  
 	while (!feof(fp));//Voor lus uit tot we aan het einde zijn 
 	
@@ -262,19 +244,10 @@ int decompress(int imageSize, int letterteller, unsigned char *inputPixels, unsi
 		b = inputPixels[i];
 		g = inputPixels[i+1];  
 		r = inputPixels[i+2];  
-		
-		
-		arrayBits[arrayTeller] = (b & 1);//Eerste bit pakken met and mask
-		
-		//ArrayTeller nakijken
-		if (arrayTeller == 7)  
-		{  
-			arrayTeller = 0;  
-		}  
-		else  
-		{  
-			arrayTeller++;  
-		}  
+		  
+		arrayBits[arrayTeller] = (b & 1);//Eerste bit pakken 01100111 --> 00000001 1  
+ 
+		arrayTeller=tellerControle(arrayTeller);  
 		  
 		teller++;  
 		if (teller == 8)//We hebben 8 bits dus een letter  
@@ -292,20 +265,13 @@ int decompress(int imageSize, int letterteller, unsigned char *inputPixels, unsi
 			{  
 				break;  
 			}  
-			letterteller += 1;//Volgende letter gaan  
+			letterteller ++;//Volgende letter gaan  
 			teller = 0;  
 		}  
 		  
 		arrayBits[arrayTeller] = (g & 1);//Eerste bit pakken 01100111 --> 00000001   
  
-		if (arrayTeller == 7)  
-		{  
-			arrayTeller = 0;  
-		}  
-		else  
-		{  
-			arrayTeller++;  
-		}  
+		arrayTeller=tellerControle(arrayTeller);
 		  
 		teller++;  
 		if (teller == 8)  
@@ -322,19 +288,12 @@ int decompress(int imageSize, int letterteller, unsigned char *inputPixels, unsi
 			{  
 				break;  
 			}  
-			letterteller += 1;  
+			letterteller ++;  
 			teller = 0;  
 		}  
 		arrayBits[arrayTeller] = (r & 1);//Eerste bit pakken 01100111 --> 00000001 1  
  
-		if (arrayTeller == 7)  
-		{  
-			arrayTeller = 0;  
-		}  
-		else  
-		{  
-			arrayTeller++;  
-		}  
+		arrayTeller=tellerControle(arrayTeller);
 		  
 		teller++;  
 		if (teller == 8)  
@@ -351,9 +310,21 @@ int decompress(int imageSize, int letterteller, unsigned char *inputPixels, unsi
 			{  
 				break;  
 			}  
-			letterteller += 1;  
+			letterteller ++;  
 			teller = 0;  
 		}  
 	} 
 	return letterteller;
+}
+int tellerControle(int arrayTeller)
+{
+	if (arrayTeller == 7)  
+	{  
+		arrayTeller = 0;  
+	}  
+	else  
+	{  
+		arrayTeller++;  
+	}  
+	return arrayTeller;
 }
