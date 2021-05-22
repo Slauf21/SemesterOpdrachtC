@@ -3,19 +3,21 @@
 #include <string.h>  
   
 #define __DEBUG  
-  
+//Functies maken
 void compressBitwise(unsigned char *pArrayBits, unsigned char *inputPixels, int i, int imageSize);  
 void compress(unsigned char *inputPixels, int imageSize, FILE *fp);  
 int decompress(int imageSize, int letterteller, unsigned char *inputPixels, unsigned char* Zin); 
  
 int main(int argc, char* argv[])  
 {  
+	//Files op NULL initialiseren
 	FILE *fp = NULL;  
 	FILE *inputFilePointer = NULL;  
 	FILE *compressed = NULL;  
-	FILE *outputTXT = NULL;  
+	FILE *outputTXT = NULL; 
+	
 	unsigned char R = 0;  
-	  
+	
 	//Commandos maken:  
 	if (argc > 1)  
 	{	  
@@ -100,19 +102,25 @@ int main(int argc, char* argv[])
 	{  
 		printf("pixel %d: B= %d, G=%d, R=%d\n", i, inputPixels[i], inputPixels[i+1], inputPixels[i+2]);  
 	}  
-     
+   
     fclose(inputFilePointer);  
-      
+    
 	if (R == 1)//Compress  
 	{  
+		//Compress functie oproepen
 		compress(inputPixels, imageSize, fp); 
-		 
+		
+		//Compressed FILE creeren, dit is de compressed bmp
 		compressed = fopen(argv[7],"wb");  
-	 
+		
+		//Eerste het header gedeelte schrijven daarna de pixels
 		fwrite(bmpHeader, sizeof(unsigned char), 54, compressed);  
 		fwrite(inputPixels, sizeof(unsigned char), imageSize, compressed);  
-		 
+		
+		//Free gealloceerde memory inputPixels
 		free(inputPixels);  
+		
+		//Close de geopende files
 		fclose(fp);  
 		fclose(compressed);  
 	 
@@ -121,39 +129,46 @@ int main(int argc, char* argv[])
  
 	else if (R == 2)//Decompress  
 	{  
+		//Zin alloceren 
 		unsigned char* Zin = (unsigned char *) calloc(imageSize, sizeof(unsigned char));  
 		int letterteller = 0;  
-		 
+		
+		//Decompress functie oproepen
 		letterteller= decompress(imageSize, letterteller, inputPixels, Zin); 
-		 
+		
+		//Outpu FILE openen, dit is de decompressed txt file
 		outputTXT = fopen(argv[5], "w");  
-		 
+		
+		//De waardes in Zin, de secret message, naar de txt schrijven
 		fwrite(Zin, sizeof(unsigned char),letterteller,outputTXT); 	  
-		 
+		
+		//Zin printen op cmd
 		printf("%s", Zin);  
-		 
-		fclose(outputTXT);  
+		
+		//Sluit de files
+		fclose(outputTXT);
+
+		//Free de memory
 		free(inputPixels);  
 		free(Zin);  
 		return 0;		  
 	}  
 }  
   
- 
+
 void compress(unsigned char *inputPixels, int imageSize, FILE *fp)  
 { 
+	//Variabelen aanmaken
 	unsigned char c = 0;  
- 
 	unsigned char bit7 = 0,bit6= 0,bit5= 0,bit4= 0,bit3= 0,bit2= 0,bit1= 0,bit0= 0;  
 	unsigned char arrayBits[8];  
- 
 	int binair = 0;  
 	unsigned char x = 1;  
- 
 	int i = 7;  
-	  
+	 
 	do  
 	{  
+		//Een character inlezen, al zijn bits appart nemen en dan opschuiven naar zijn plaats
 		c = fgetc(fp);		  
 		bit7=(c & 0x80)>>7;  
 		arrayBits[7] = bit7;  
@@ -171,19 +186,21 @@ void compress(unsigned char *inputPixels, int imageSize, FILE *fp)
 		arrayBits[1] = bit1;  
 		bit0=c & 0x01;  
 		arrayBits[0] = bit0;  
-		  
+		
+		//Print de binaire waardes van de characters
 		printf("%d%d%d%d%d%d%d%d\n", bit7,bit6,bit5,bit4,bit3,bit2,bit1,bit0);  
-		  
+		
+		//Compress bitwise functie oproepen
 		compressBitwise(arrayBits,inputPixels,i,imageSize);  
-		  
+		
 		i += 8;  
-		  
+		
 		binair = (int) c;  
 		while (c > 0)  
 		{  
 			if ((c % 2) == 0)  
 			{  
-				binair = binair << 0;  
+				binair = binair << 0; //0 keer shift??? 
 				c = c / 2;				  
 			}		  
 			else  
@@ -198,13 +215,14 @@ void compress(unsigned char *inputPixels, int imageSize, FILE *fp)
 			}  
 		}  
 	}  
-	while (!feof(fp));  
-	  
+	while (!feof(fp));//Voor lus uit tot we aan het einde zijn 
+	
 	for(int i = 0; i < imageSize-2; i+=3)  
 	{  
 		printf("pixel %d: B= %d, G=%d, R=%d\n", i, inputPixels[i], inputPixels[i+1], inputPixels[i+2]);  
 	}  
 } 
+
 void compressBitwise(unsigned char *pArrayBits, unsigned char *inputPixels, int i, int imageSize)  
 {  
 	//De letter in de pixels zetten  
@@ -230,6 +248,7 @@ void compressBitwise(unsigned char *pArrayBits, unsigned char *inputPixels, int 
  
 int decompress(int imageSize, int letterteller, unsigned char *inputPixels, unsigned char* Zin) 
 { 
+	//Variablen maken
 	unsigned char teller = 0;  
 	unsigned char arrayBits[8] = {0};  
 	unsigned char r = 0;  
@@ -239,13 +258,15 @@ int decompress(int imageSize, int letterteller, unsigned char *inputPixels, unsi
  
 	for (int i = 0; i < imageSize-2; i+=3)//Naar elke pixel kijken  
 	{  
-		  
-		b = inputPixels[i];//Waarde tussen 0 - 255  
+		//De pixel waardes van b, g, r in de variabelen zetten
+		b = inputPixels[i];
 		g = inputPixels[i+1];  
 		r = inputPixels[i+2];  
-		  
-		arrayBits[arrayTeller] = (b & 1);//Eerste bit pakken 01100111 --> 00000001 1  
- 
+		
+		
+		arrayBits[arrayTeller] = (b & 1);//Eerste bit pakken met and mask
+		
+		//ArrayTeller nakijken
 		if (arrayTeller == 7)  
 		{  
 			arrayTeller = 0;  
